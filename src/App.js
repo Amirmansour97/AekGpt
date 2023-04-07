@@ -1,21 +1,20 @@
-import logo from './logo.svg';
 import './App.css';
 import './normal.css';
 import { useState, useEffect } from 'react';
-import ChatMessage from './components/ChatMessage';
+import ChatMessage from './components/ChatMessage.js';
 
 function App() {
   //to run once when app uploads which is engines
 
-  useEffect(() => {
-    getEngines();
-  }, []);
+  // useEffect(() => {
+  //   getEngines();
+  // }, []);
 
   // adding a state to add input and chatlog
 
   const [input, setInput] = useState('');
   const [models, setModels] = useState([]);
-  const [currentModel, setCurrentModel] = useState('Your Model');
+  const [currentModel, setCurrentModel] = useState('Model');
 
   const [chatlog, setChatLog] = useState([
     {
@@ -36,27 +35,27 @@ function App() {
 
     const messages = chatLogNew.map((message) => message.message).join('\n');
     // feting response to the api to combine the chatlog array of msgs and sending it as a msg to localhost 3000
-    const response = await fetch('http://localhost:3080/', {
+    const response = await fetch('http://localhost:3050/', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ message: messages, currentModel }),
+      body: JSON.stringify({ message: messages }),
     });
     // , currentModel up
     const data = await response.json();
-    setChatLog([...chatLogNew, { user: 'gpt', message: `${data.message}` }]);
-    console.log(data.message);
+    setChatLog([...chatLogNew, { user: 'gpt', message: `${data.completion.content}` }]);
+    console.log(data.completion);
   }
 
   function clearChat() {
     setChatLog([]);
   }
-  function getEngines() {
-    fetch('http://localhost:3080/models')
-      .then((res) => res.json())
-      .then((data) => setModels(data.models.data));
-  }
+  // function getEngines() {
+  //   fetch('http://localhost:3080/models')
+  //     .then((res) => res.json())
+  //     .then((data) => setModels(data.models.data));
+  // }
   return (
     <div className="App">
       <aside className="sideMenu">
@@ -64,7 +63,7 @@ function App() {
           <span>+</span>New Chat
         </div>
         <div>
-          <select onChange={(e) => setCurrentModel(e.target.value)}>
+          <select>
             {models.map((model, index) => (
               <option key={model.id} value={model.id}>
                 {model.id}
@@ -94,20 +93,20 @@ function App() {
             </div>
           </div> */}
         </div>
-        <div className="chat-input-holder">
-          <form onSubmit={handleSubmit}>
-            <input
-              value={input}
-              onChange={(e) => {
-                setInput(e.target.value);
-              }}
-              rows="1"
-              className="chat-input-area"
-              placeholder="Enter what you are thinking of"
-            ></input>
-          </form>
-        </div>
       </section>
+      <div className="chat-input-holder">
+        <form onSubmit={handleSubmit}>
+          <input
+            value={input}
+            onChange={(e) => {
+              setInput(e.target.value);
+            }}
+            rows="1"
+            className="chat-input-area"
+            placeholder="Enter what you are thinking of"
+          ></input>
+        </form>
+      </div>
     </div>
   );
 }

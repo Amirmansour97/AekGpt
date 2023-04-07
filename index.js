@@ -1,41 +1,30 @@
-const { Configuration, OpenAIApi } = require('openai');
+import { Configuration, OpenAIApi } from 'openai';
+import express from 'express';
+import bodyParser from 'body-parser';
+import cors from 'cors';
+
 const configuration = new Configuration({
   organization: 'org-T2tFDUGlF2ITDfu9KUWSuN4k',
-  apiKey: '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',
+  apiKey: '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',
 });
-const openai = new OpenAIApi(configuration);
-const cors = require('cors');
-// const response = await openai.listEngines();
 
-// creating simple Express Api
-const express = require('express');
-const bodyParser = require('body-parser');
+const openai = new OpenAIApi(configuration);
+
+//server
 const app = express();
+const port = 3050;
 app.use(bodyParser.json());
 app.use(cors());
 
-const port = 3080;
-//get
 app.post('/', async (req, res) => {
-  const { message, currentModel } = req.body;
-  // the prob is here
-  const response = await openai.createCompletion({
-    model: `${currentModel}`,
-    prompt: `${message}`,
-    max_tokens: 500,
-    temperature: 1,
+  const { message } = req.body;
+  const completion = await openai.createChatCompletion({
+    model: 'gpt-3.5-turbo',
+    messages: [{ role: 'user', content: `${message}` }],
   });
-  res.json({
-    data: response.data,
-    message: response.data.choices[0].text,
-  });
-  //
+  res.json({ completion: completion.data.choices[0].message });
 });
-app.get('/models', async (req, res) => {
-  const response = await openai.listEngines();
-  console.log(response.data);
-  res.json({ models: response.data });
-});
+
 app.listen(port, () => {
   console.log(`example that works on https://localhost:${port}`);
 });
