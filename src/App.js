@@ -45,7 +45,7 @@ function App() {
     // , currentModel up
     const data = await response.json();
     setChatLog([...chatLogNew, { user: 'gpt', message: `${data.completion.content}` }]);
-    console.log(data.completion);
+    console.log(data.completion.content);
   }
 
   function clearChat() {
